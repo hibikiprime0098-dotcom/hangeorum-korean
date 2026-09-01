@@ -1,7 +1,7 @@
 (async()=>{
   if(window.__HANGEORUM_V81_PATCH__||window.__HANGEORUM_V81_LOADING__)return;
   window.__HANGEORUM_V81_LOADING__=true;
-  const VERSION='813';
+  const VERSION='814';
   const rawBase='https://raw.githubusercontent.com/hibikiprime0098-dotcom/hangeorum-korean/main/';
   const sleep=ms=>new Promise(r=>setTimeout(r,ms));
   async function fetchPart(i){
@@ -21,32 +21,26 @@
     }
     throw new Error(`v81p${i}.txt 取得失敗: ${last?.message||last}`);
   }
-  async function loadPako(){
-    if(window.pako?.ungzip)return window.pako;
-    await new Promise((resolve,reject)=>{
-      const s=document.createElement('script');
-      s.src='https://cdn.jsdelivr.net/npm/pako@2.1.0/dist/pako.min.js';
-      s.async=true;
-      s.onload=resolve;
-      s.onerror=()=>reject(new Error('代替解凍ライブラリの取得に失敗'));
-      document.head.appendChild(s);
-    });
-    if(!window.pako?.ungzip)throw new Error('代替解凍ライブラリを利用できません');
-    return window.pako;
-  }
   async function gunzipText(bin){
-    let nativeError=null;
-    if(typeof DecompressionStream==='function'){
-      try{
-        const ds=new DecompressionStream('gzip');
-        return await new Response(new Blob([bin]).stream().pipeThrough(ds)).text();
-      }catch(e){nativeError=e}
+    if(typeof DecompressionStream!=='function'){
+      throw new Error('このブラウザはDecompressionStreamに対応していません');
     }
     try{
-      const pako=await loadPako();
-      return new TextDecoder('utf-8').decode(pako.ungzip(bin));
+      const ds=new DecompressionStream('gzip');
+      const stream=new Blob([bin]).stream().pipeThrough(ds);
+      const reader=stream.getReader();
+      const decoder=new TextDecoder('utf-8');
+      let out='';
+      while(true){
+        const {value,done}=await reader.read();
+        if(done)break;
+        out+=decoder.decode(value,{stream:true});
+      }
+      out+=decoder.decode();
+      if(!out)throw new Error('解凍後データが空です');
+      return out;
     }catch(e){
-      throw new Error(`解凍失敗: ${e.message}${nativeError?` / native: ${nativeError.message}`:''}`);
+      throw new Error(`解凍失敗: ${e?.message||e}`);
     }
   }
   try{
@@ -62,6 +56,7 @@
     document.documentElement.appendChild(s);
     s.remove();
     window.__HANGEORUM_V81_PATCH__=true;
+    document.getElementById('v81LoadError')?.remove();
   }catch(e){
     console.error('한걸음 v8.1 patch load failed',e);
     document.getElementById('v81LoadError')?.remove();
