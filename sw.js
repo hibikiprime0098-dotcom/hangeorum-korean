@@ -1,4 +1,4 @@
-const CACHE='hangeorum-v81-patch2';
+const CACHE='hangeorum-v81-patch3';
 const CORE=[
   './','./index.html','./manifest.webmanifest','./icon.svg','./v81-patch-loader.js',
   ...Array.from({length:8},(_,i)=>`./v81p${i+1}.txt`)
@@ -26,9 +26,9 @@ async function patchedNavigation(req){
   if(!r)return new Response('offline',{status:503});
   let html=await r.text();
   if(!html.includes('v81-patch-loader.js')){
-    html=html.replace('</body>','<script src="./v81-patch-loader.js?v=812"></script></body>');
+    html=html.replace('</body>','<script src="./v81-patch-loader.js?v=813"></script></body>');
   }
-  return new Response(html,{status:200,headers:{'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-cache'}});
+  return new Response(html,{status:200,headers:{'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-cache, no-store, must-revalidate'}});
 }
 self.addEventListener('fetch',e=>{
   if(e.request.method!=='GET')return;
@@ -36,7 +36,7 @@ self.addEventListener('fetch',e=>{
     e.respondWith(patchedNavigation(e.request));
     return;
   }
-  e.respondWith(fetch(e.request).then(r=>{
+  e.respondWith(fetch(e.request,{cache:'no-store'}).then(r=>{
     const copy=r.clone();
     caches.open(CACHE).then(c=>c.put(e.request,copy));
     return r;
