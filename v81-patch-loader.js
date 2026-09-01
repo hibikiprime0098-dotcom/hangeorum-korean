@@ -1,7 +1,7 @@
 (async()=>{
   if(window.__HANGEORUM_V81_PATCH__||window.__HANGEORUM_V81_LOADING__)return;
   window.__HANGEORUM_V81_LOADING__=true;
-  const VERSION='814';
+  const VERSION='815';
   const rawBase='https://raw.githubusercontent.com/hibikiprime0098-dotcom/hangeorum-korean/main/';
   const sleep=ms=>new Promise(r=>setTimeout(r,ms));
   async function fetchPart(i){
@@ -21,26 +21,52 @@
     }
     throw new Error(`v81p${i}.txt 取得失敗: ${last?.message||last}`);
   }
-  async function gunzipText(bin){
-    if(typeof DecompressionStream!=='function'){
-      throw new Error('このブラウザはDecompressionStreamに対応していません');
+  async function readTextStream(stream){
+    const reader=stream.getReader();
+    const decoder=new TextDecoder('utf-8');
+    let out='';
+    while(true){
+      const {value,done}=await reader.read();
+      if(done)break;
+      out+=decoder.decode(value,{stream:true});
     }
+    out+=decoder.decode();
+    return out;
+  }
+  function gzipPayloadRange(bin){
+    if(bin.length<18||bin[0]!==0x1f||bin[1]!==0x8b||bin[2]!==8)throw new Error('gzip header invalid');
+    const flg=bin[3];
+    let p=10;
+    if(flg&4){
+      if(p+2>bin.length)throw new Error('gzip extra header invalid');
+      const xlen=bin[p]|(bin[p+1]<<8);p+=2+xlen;
+    }
+    if(flg&8){while(p<bin.length&&bin[p]!==0)p++;p++}
+    if(flg&16){while(p<bin.length&&bin[p]!==0)p++;p++}
+    if(flg&2)p+=2;
+    const end=bin.length-8;
+    if(p>=end)throw new Error('gzip payload missing');
+    return [p,end];
+  }
+  async function gunzipText(bin){
+    if(typeof DecompressionStream!=='function')throw new Error('このブラウザはDecompressionStreamに対応していません');
+    let gzipErr=null;
     try{
       const ds=new DecompressionStream('gzip');
-      const stream=new Blob([bin]).stream().pipeThrough(ds);
-      const reader=stream.getReader();
-      const decoder=new TextDecoder('utf-8');
-      let out='';
-      while(true){
-        const {value,done}=await reader.read();
-        if(done)break;
-        out+=decoder.decode(value,{stream:true});
-      }
-      out+=decoder.decode();
+      const out=await readTextStream(new Blob([bin]).stream().pipeThrough(ds));
       if(!out)throw new Error('解凍後データが空です');
       return out;
-    }catch(e){
-      throw new Error(`解凍失敗: ${e?.message||e}`);
+    }catch(e){gzipErr=e}
+    try{
+      const [start,end]=gzipPayloadRange(bin);
+      const raw=bin.slice(start,end);
+      const ds=new DecompressionStream('deflate-raw');
+      const out=await readTextStream(new Blob([raw]).stream().pipeThrough(ds));
+      if(!out)throw new Error('raw deflate解凍後データが空です');
+      console.warn('한걸음: gzip CRC check failed, recovered with raw deflate',gzipErr);
+      return out;
+    }catch(rawErr){
+      throw new Error(`解凍失敗: gzip=${gzipErr?.message||gzipErr} / raw=${rawErr?.message||rawErr}`);
     }
   }
   try{
