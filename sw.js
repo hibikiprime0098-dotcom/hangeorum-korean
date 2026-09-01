@@ -1,4 +1,4 @@
-const CACHE='hangeorum-v81-patch';
+const CACHE='hangeorum-v81-patch2';
 const CORE=[
   './','./index.html','./manifest.webmanifest','./icon.svg','./v81-patch-loader.js',
   ...Array.from({length:8},(_,i)=>`./v81p${i+1}.txt`)
@@ -26,7 +26,7 @@ async function patchedNavigation(req){
   if(!r)return new Response('offline',{status:503});
   let html=await r.text();
   if(!html.includes('v81-patch-loader.js')){
-    html=html.replace('</body>','<script src="./v81-patch-loader.js?v=81"></script></body>');
+    html=html.replace('</body>','<script src="./v81-patch-loader.js?v=812"></script></body>');
   }
   return new Response(html,{status:200,headers:{'Content-Type':'text/html; charset=utf-8','Cache-Control':'no-cache'}});
 }
