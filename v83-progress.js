@@ -3,6 +3,7 @@ if(window.__HANGEORUM_V83_PROGRESS__)return;window.__HANGEORUM_V83_PROGRESS__=tr
 const VERSION=3, LS='korean-progress-backup-v3', LEDGER='korean-promotion-ledger-v3';
 const clamp=v=>Math.max(1,Math.min(10,Number(v)||1));
 const safeParse=(s,f)=>{try{return JSON.parse(s)}catch{return f}};
+const mergeFlags=(a={},b={})=>{const out={};for(const k of new Set([...Object.keys(a||{}),...Object.keys(b||{})]))out[k]=!!a[k]||!!b[k];return out};
 const byId=(a=[])=>{const m=new Map();for(const x of a||[]){if(!x)continue;const k=String(x.id??`${x.ts||0}-${x.type||''}-${x.level||''}`);if(!m.has(k)||Number(m.get(k)?.ts||0)<Number(x.ts||0))m.set(k,x)}return [...m.values()].sort((x,y)=>Number(x.ts||0)-Number(y.ts||0)).slice(-200)};
 function inferredLevel(hist=[]){let lv=1;for(const h of hist||[]){if(h?.type==='昇格'&&Number(h.score)>=80)lv=Math.max(lv,clamp(Number(h.level)+1))}return lv}
 function ledger(){return safeParse(localStorage.getItem(LEDGER)||'[]',[])}
@@ -19,8 +20,8 @@ function mergeSnapshot(s){if(!s||typeof s!=='object')return false;let changed=fa
  if(best!==state.currentLevel){state.currentLevel=best;changed=true}
  const ld=best>beforeLevel?best:Math.min(best,Math.max(clamp(state.listenLevel||1),clamp(s.listenLevel||1)));if(ld!==state.listenLevel){state.listenLevel=ld;changed=true}
  if(s.listenScope&&s.listenScope!==state.listenScope){state.listenScope=s.listenScope;changed=true}
- const gd={...(s.grammarDone||{}),...(state.grammarDone||{})};if(Object.keys(gd).length!==Object.keys(state.grammarDone||{}).length){state.grammarDone=gd;changed=true}
- const vk={...(s.vocabKnown||{}),...(state.vocabKnown||{})};if(Object.keys(vk).length!==Object.keys(state.vocabKnown||{}).length){state.vocabKnown=vk;changed=true}
+ const gd=mergeFlags(s.grammarDone||{},state.grammarDone||{});if(JSON.stringify(gd)!==JSON.stringify(state.grammarDone||{})){state.grammarDone=gd;changed=true}
+ const vk=mergeFlags(s.vocabKnown||{},state.vocabKnown||{});if(JSON.stringify(vk)!==JSON.stringify(state.vocabKnown||{})){state.vocabKnown=vk;changed=true}
  state.grammarLevel=Math.min(10,Math.max(clamp(state.grammarLevel||1),clamp(s.grammarLevel||1)));
  state.vocabLevel=Math.min(10,Math.max(clamp(state.vocabLevel||1),clamp(s.vocabLevel||1)));
  state.miniLevel=Math.min(10,Math.max(clamp(state.miniLevel||1),clamp(s.miniLevel||1)));
