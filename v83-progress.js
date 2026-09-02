@@ -14,9 +14,10 @@ async function putDB(s){try{const db=await openDB();await new Promise((resolve,r
 async function getDB(){try{const db=await openDB();const v=await new Promise((resolve,reject)=>{const tx=db.transaction('snapshots','readonly');const r=tx.objectStore('snapshots').get('latest');r.onsuccess=()=>resolve(r.result||null);r.onerror=()=>reject(r.error)});db.close();return v}catch{return null}}
 let saveTimer=null;function scheduleSave(){clearTimeout(saveTimer);saveTimer=setTimeout(()=>{const s=persistLocal();putDB(s)},180)}
 function mergeSnapshot(s){if(!s||typeof s!=='object')return false;let changed=false;const hist=byId([...(state.testHistory||[]),...(s.testHistory||[])]);const led=byId([...ledger(),...(s.promotionLedger||[])]);try{localStorage.setItem(LEDGER,JSON.stringify(led))}catch{}
- const best=Math.max(clamp(state.currentLevel),clamp(s.currentLevel||1),inferredLevel(hist),...led.map(x=>Number(x?.score)>=80?clamp(Number(x.level)+1):1));
+ const beforeLevel=clamp(state.currentLevel);
+ const best=Math.max(beforeLevel,clamp(s.currentLevel||1),inferredLevel(hist),...led.map(x=>Number(x?.score)>=80?clamp(Number(x.level)+1):1));
  if(best!==state.currentLevel){state.currentLevel=best;changed=true}
- const ld=Math.min(best,Math.max(clamp(state.listenLevel||1),clamp(s.listenLevel||1)));if(ld!==state.listenLevel){state.listenLevel=ld;changed=true}
+ const ld=best>beforeLevel?best:Math.min(best,Math.max(clamp(state.listenLevel||1),clamp(s.listenLevel||1)));if(ld!==state.listenLevel){state.listenLevel=ld;changed=true}
  if(s.listenScope&&s.listenScope!==state.listenScope){state.listenScope=s.listenScope;changed=true}
  const gd={...(s.grammarDone||{}),...(state.grammarDone||{})};if(Object.keys(gd).length!==Object.keys(state.grammarDone||{}).length){state.grammarDone=gd;changed=true}
  const vk={...(s.vocabKnown||{}),...(state.vocabKnown||{})};if(Object.keys(vk).length!==Object.keys(state.vocabKnown||{}).length){state.vocabKnown=vk;changed=true}
@@ -24,7 +25,7 @@ function mergeSnapshot(s){if(!s||typeof s!=='object')return false;let changed=fa
  state.vocabLevel=Math.min(10,Math.max(clamp(state.vocabLevel||1),clamp(s.vocabLevel||1)));
  state.miniLevel=Math.min(10,Math.max(clamp(state.miniLevel||1),clamp(s.miniLevel||1)));
  state.testHistory=hist;return changed}
-function reconcileLocal(){const b=safeParse(localStorage.getItem(LS)||'null',null);let changed=mergeSnapshot(b);const hist=inferredLevel(state.testHistory||[]),led=ledgerLevel(),best=Math.max(clamp(state.currentLevel),hist,led);if(best!==state.currentLevel){state.currentLevel=best;changed=true}state.listenLevel=Math.min(state.currentLevel,Math.max(1,state.listenLevel||state.currentLevel));persistLocal();return changed}
+function reconcileLocal(){const b=safeParse(localStorage.getItem(LS)||'null',null);let changed=mergeSnapshot(b);const before=clamp(state.currentLevel),hist=inferredLevel(state.testHistory||[]),led=ledgerLevel(),best=Math.max(before,hist,led);if(best!==state.currentLevel){state.currentLevel=best;state.listenLevel=best;changed=true}state.listenLevel=Math.min(state.currentLevel,Math.max(1,state.listenLevel||state.currentLevel));persistLocal();return changed}
 function addPromotion(level,result){if(Number(result?.score)<80)return;const a=ledger();a.push({id:`L${level}-${Date.now()}`,level:Number(level),score:Number(result.score),ts:Date.now()});localStorage.setItem(LEDGER,JSON.stringify(byId(a)));scheduleSave()}
 function exportProgress(){const data=JSON.stringify(snapshot(),null,2),blob=new Blob([data],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=`hangeorum-progress-${new Date().toISOString().slice(0,10)}.json`;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1200)}
 function importProgress(file){if(!file)return;const r=new FileReader();r.onload=()=>{try{const s=JSON.parse(String(r.result||''));if(s.schema!=='hangeorum-progress')throw new Error('한걸음進捗ファイルではありません');mergeSnapshot(s);persistLocal();putDB(snapshot());alert(`進捗を復元しました。現在 Level ${state.currentLevel} です。`);render()}catch(e){alert('進捗ファイルを読み込めませんでした：'+(e?.message||e))}};r.readAsText(file)}
