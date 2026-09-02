@@ -1,8 +1,8 @@
-const CACHE='hangeorum-v85-final';
+const CACHE='hangeorum-v86-final';
 const CORE=[
   './','./index.html','./base.html','./manifest.webmanifest','./icon.svg','./v81-patch-loader.js',
   './v82-core.js','./v82-g1.js','./v82-g2.js','./v82-g3.js','./v82-g4.js','./v82-g5.js',
-  './v82-l1.js','./v82-l2.js','./v82-le1.js','./v82-le2.js','./v82-listen-ui.js','./v82-ui.js','./v83-progress.js','./v84-tests.js','./v85-learning.js'
+  './v82-l1.js','./v82-l2.js','./v82-le1.js','./v82-le2.js','./v82-listen-ui.js','./v82-ui.js','./v83-progress.js','./v84-tests.js','./v85-learning.js','./v86-grammar.js'
 ];
 self.addEventListener('install',e=>{
   e.waitUntil(caches.open(CACHE).then(c=>c.addAll(CORE)));
