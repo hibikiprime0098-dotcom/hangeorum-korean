@@ -1,0 +1,1 @@
+Neutral-hosting target: Vercel Hobby. Keep GitHub Pages production as fallback.
