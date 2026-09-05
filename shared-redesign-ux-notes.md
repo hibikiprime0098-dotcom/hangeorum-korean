@@ -1,0 +1,1 @@
+Goals: preserve content/status logic, simplify visual hierarchy, improve motivation cues, improve mobile readability, preserve progress isolation.
