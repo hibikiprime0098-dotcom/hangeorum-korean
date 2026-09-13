@@ -1,0 +1,15 @@
+{
+  "id": "./",
+  "name": "한걸음｜韓国語学習",
+  "short_name": "한걸음",
+  "description": "聞いてわかる韓国語を、少しずつ。単語・文法・Listening・テスト・成長記録で学ぶ韓国語学習アプリ。",
+  "lang": "ja",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f6f6f3",
+  "theme_color": "#111111",
+  "icons": [
+    {"src":"../icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}
+  ]
+}
