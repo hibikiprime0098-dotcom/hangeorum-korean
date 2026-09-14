@@ -1,4 +1,4 @@
-const CACHE='hangeorum-v95-shared-final';
+const CACHE='hangeorum-v97-shared-link-fix';
 const CORE=[
   './','./index.html','./base.html','./manifest.webmanifest','./icon.svg','./v81-patch-loader.js',
   './v82-core.js','./v82-g1.js','./v82-g2.js','./v82-g3.js','./v82-g4.js','./v82-g5.js',
