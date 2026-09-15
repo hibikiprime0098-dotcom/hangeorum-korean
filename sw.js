@@ -1,8 +1,8 @@
-const CACHE='hangeorum-v97-shared-link-fix';
+const CACHE='hangeorum-v98-restructure';
 const CORE=[
   './','./index.html','./base.html','./manifest.webmanifest','./icon.svg','./v81-patch-loader.js',
   './v82-core.js','./v82-g1.js','./v82-g2.js','./v82-g3.js','./v82-g4.js','./v82-g5.js',
-  './v82-l1.js','./v82-l2.js','./v82-le1.js','./v82-le2.js','./v82-listen-ui.js','./v82-ui.js','./v83-progress.js','./v84-tests.js','./v85-learning.js','./v86-grammar.js','./v87-grammar-fix.js','./v88-sharing.js','./v89-growth-contrast.js',
+  './v82-l1.js','./v82-l2.js','./v82-le1.js','./v82-le2.js','./v82-listen-ui.js','./v82-ui.js','./v83-progress.js','./v84-tests.js','./v85-learning.js','./v86-grammar.js','./v87-grammar-fix.js','./v88-sharing.js','./v89-growth-contrast.js','./v90-restructure.js',
   './share/','./share/index.html','./share/shared-loader.js','./share/v90-redesign.js','./share/v91-final.js','./share/v92-product.js','./share/v93-curriculum-tests-growth.js','./share/v94-v93-compat.js','./share/v95-final-ui.js'
 ];
 self.addEventListener('install',e=>{
