@@ -1,6 +1,6 @@
 (()=>{
 if(window.__HANGEORUM_V953_PROMOTION__)return;window.__HANGEORUM_V953_PROMOTION__=1;
-window.HANGEORUM_VERSION='9.5.3';
+window.HANGEORUM_VERSION='9.5.4';
 const PROMOTION_TEMPLATE=[
 {id:1,cat:'文字',q:'ㅏ の音として最も近いものは？',o:['ア','オ','ウ','イ'],a:0,e:'ㅏ は「ア」に近い基本母音です。'},
 {id:2,cat:'文字',q:'ㅓ の音として最も近い説明は？',o:['ア','日本語に完全一致しないオ系の音','イ','エ'],a:1,e:'ㅓ は日本語に完全一致しないため、耳で区別する練習が必要です。'},
@@ -54,7 +54,22 @@ function promotionIntro(){
  if(fromLevel()>=10)return '<section class="card hero"><span class="pill">LEVEL UP EXAM</span><h2>Level 10 到達済み</h2><p>現在が最高Levelです。</p></section>';
  return levelText(examIntro());
 }
-function promotionQuestions(){return PROMOTION_TEMPLATE.map(q=>({...q,o:[...(q.o||[])],_promotionTarget:targetLevel()}))}
+async function promotionQuestions(){
+ const lv=targetLevel(),saved={view:state.view,mode:state.v90TestMode,active:state.miniActive,result:state.miniResult,questions:state.miniQuestions,answers:state.miniAnswers,index:state.miniIndex,type:state.miniType,level:state.miniLevel};
+ const vocab=[],seen=new Set();
+ for(let n=0;n<5&&vocab.length<16;n++){
+   await startMini('vocab',lv,'all');
+   for(const q of (state.miniQuestions||[])){const k=(q.text||q.audio||q.q)+'|'+(q.o||[]).join('|');if(!seen.has(k)){seen.add(k);vocab.push({...q,cat:'語彙'})}if(vocab.length>=16)break}
+ }
+ const rb=typeof window.v95ReadingBank==='function'?window.v95ReadingBank(lv):[];
+ const lb=typeof window.v95ListeningBank==='function'?window.v95ListeningBank(lv):[];
+ const reading=rb.slice(0,8).map(q=>({...q,cat:'Reading'}));
+ const listen=lb.slice(0,6).map(q=>({...q,cat:'Listening'}));
+ const practical=[...lb.slice(6,13),...rb.slice(8,11)].slice(0,10).map((q,i)=>({...q,cat:i<5?'会話Listening':i<8?'スピーチListening':'実践理解'}));
+ Object.assign(state,{view:'exam',v90TestMode:'promotion',miniActive:saved.active,miniResult:saved.result,miniQuestions:saved.questions,miniAnswers:saved.answers,miniIndex:saved.index,miniType:saved.type,miniLevel:saved.level});
+ const all=[...vocab.slice(0,16),...reading,...listen,...practical];
+ return all.slice(0,40).map((q,i)=>({...q,id:i+1,_promotionTarget:lv}));
+}
 function promotionView(){
  const qs=state.v953PromotionQuestions||[];
  if(!state.examStarted)return promotionIntro();
@@ -69,14 +84,14 @@ render=function(){
  beforeRender();
  if(state.view!=='exam'||state.v90TestMode!=='promotion')return;
  const start=document.getElementById('startExam');
- if(start)start.onclick=()=>{state.v953PromotionTarget=targetLevel();state.v953PromotionQuestions=promotionQuestions();state.examStarted=true;state.qIndex=0;state.answers={};state.examResult=null;render()};
+ if(start)start.onclick=async()=>{start.disabled=true;start.textContent='問題を準備しています…';state.v953PromotionTarget=targetLevel();state.v953PromotionQuestions=await promotionQuestions();state.examStarted=true;state.qIndex=0;state.answers={};state.examResult=null;render()};
  const back=document.getElementById('v90BackTestsTop');if(back)back.onclick=()=>{state.examStarted=false;state.examResult=null;state.answers={};state.qIndex=0;state.v953PromotionQuestions=[];state.v90TestMode='hub';render();window.scrollTo({top:0,behavior:'smooth'})};
  if(state.examStarted&&!state.examResult&&(state.v953PromotionQuestions||[]).length){
   const qs=state.v953PromotionQuestions;
   bindQuiz('exam',qs,()=>state.qIndex,v=>state.qIndex=v,state.answers,v=>{state.examResult=v;recordTest('昇格',state.v953PromotionTarget,v,qs);if(v.score>=80&&state.currentLevel<state.v953PromotionTarget){state.currentLevel=state.v953PromotionTarget;localStorage.setItem('korean-current-level',String(state.currentLevel))}});
  }
  if(state.examResult){const rr=document.getElementById('reviewRestart');if(rr)rr.onclick=()=>{state.examStarted=false;state.examResult=null;state.answers={};state.qIndex=0;state.v953PromotionQuestions=[];render()};if(state.examResult.score>=80){const h=document.querySelector('#content .hero h2');if(h)h.textContent=`合格。Level ${state.currentLevel} に昇格しました。`}}
- document.querySelectorAll('.v82version').forEach(e=>e.textContent='v9.5.3');
+ document.querySelectorAll('.v82version').forEach(e=>e.textContent='v9.5.4');
 };
 render();
 })();
