@@ -1,7 +1,7 @@
 (()=>{
 if(window.__HANGEORUM_V1000__)return;window.__HANGEORUM_V1000__=1;
 window.HANGEORUM_VERSION='10.0';
-window.HANGEORUM_BUILD='1003';
+window.HANGEORUM_BUILD='1004';
 document.title='한걸음 | 韓国語学習 v10.0';
 
 const params=new URLSearchParams(location.search);
@@ -26,7 +26,7 @@ if(params.get('fresh')==='1'&&!hasTransfer){
     listenIndex:0,
     listenSelected:null,
     listenChecked:false,
-    learnTab:'course',
+    learnTab:'grammar',
     grammarLevel:1,
     grammarDone:{},
     grammarPriority:'all',
