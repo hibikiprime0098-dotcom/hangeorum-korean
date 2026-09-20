@@ -26,16 +26,30 @@
       try {
         const q=new URLSearchParams(location.search);
         const token=q.get('s')||'';
-        let firstOpen=true;
+        const meaningfulProgress=()=>{
+          try{
+            if(Number(localStorage.getItem('korean-current-level')||1)>1)return true;
+            const hist=JSON.parse(localStorage.getItem('korean-test-history')||'[]');
+            if(Array.isArray(hist)&&hist.length)return true;
+            const known=JSON.parse(localStorage.getItem('korean-vocab-known')||'{}');
+            if(known&&Object.values(known).some(Boolean))return true;
+            const done=JSON.parse(localStorage.getItem('korean-grammar-done')||'{}');
+            if(done&&Object.values(done).some(Boolean))return true;
+            const mastery=JSON.parse(localStorage.getItem('korean-auto-mastery-v93')||'{}');
+            if(mastery&&Object.values(mastery).some(v=>v&&typeof v==='object'&&Object.keys(v).length))return true;
+          }catch{}
+          return false;
+        };
+        let firstOpen=true,receipts=[];
         if(token){
-          let receipts=[];
           try{receipts=JSON.parse(localStorage.getItem('hg-share-receipts')||'[]')}catch{}
           if(!Array.isArray(receipts)) receipts=[];
           firstOpen=!receipts.includes(token);
-          if(firstOpen){
-            receipts=[...receipts.filter(x=>x!==token).slice(-49),token];
-            localStorage.setItem('hg-share-receipts',JSON.stringify(receipts));
+          if(firstOpen&&meaningfulProgress()){
+            firstOpen=confirm('この端末には既存の学習進捗があります。\n\n新規学習者としてLevel 1・0%から開始すると、現在の進捗はこの端末から削除されます。\n\n0%から開始しますか？');
           }
+          receipts=[...receipts.filter(x=>x!==token).slice(-49),token];
+          localStorage.setItem('hg-share-receipts',JSON.stringify(receipts));
         }
         const target = new URL('../', location.href);
         if(firstOpen) target.searchParams.set('fresh','1');
