@@ -24,10 +24,23 @@
   <script>
     (() => {
       try {
+        const q=new URLSearchParams(location.search);
+        const token=q.get('s')||'';
+        let firstOpen=true;
+        if(token){
+          let receipts=[];
+          try{receipts=JSON.parse(localStorage.getItem('hg-share-receipts')||'[]')}catch{}
+          if(!Array.isArray(receipts)) receipts=[];
+          firstOpen=!receipts.includes(token);
+          if(firstOpen){
+            receipts=[...receipts.filter(x=>x!==token).slice(-49),token];
+            localStorage.setItem('hg-share-receipts',JSON.stringify(receipts));
+          }
+        }
         const target = new URL('../', location.href);
-        target.searchParams.set('fresh','1');
+        if(firstOpen) target.searchParams.set('fresh','1');
         target.searchParams.set('shared','1');
-        target.searchParams.set('v','1002');
+        target.searchParams.set('v','1003');
         location.replace(target.href);
       } catch (e) {
         document.querySelector('.boot p').textContent='起動に失敗しました。再読み込みしてください。';
