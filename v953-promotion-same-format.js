@@ -65,6 +65,7 @@ async function promotionQuestions(){
  }
  const vocab=[],seen=new Set();
  for(let n=0;n<5&&vocab.length<16;n++){
+   state.miniQuestions=[];
    await startMini('vocab',lv,'all');
    for(const q of (state.miniQuestions||[])){
      const k=(q.text||q.audio||(q.lines?JSON.stringify(q.lines):q.q))+'|'+(q.o||[]).join('|');
