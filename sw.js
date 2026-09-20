@@ -1,4 +1,4 @@
-const CACHE='hangeorum-v1003-unified';
+const CACHE='hangeorum-v1004-unified';
 const CORE=[
   "./",
   "./index.html",
@@ -27,7 +27,6 @@ const CORE=[
   "./v89-growth-contrast.js",
   "./v90-restructure.js",
   "./v91-nav-visibility.js",
-  "./v92a-lessons-contrast.js",
   "./v92b-vocab-levels.js",
   "./v92c-reading-growth.js",
   "./v93-auto-mastery.js",
