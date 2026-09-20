@@ -1,4 +1,4 @@
-const CACHE='hangeorum-v1005-unified';
+const CACHE='hangeorum-v1006-unified';
 const CORE=[
   "./",
   "./index.html",
@@ -36,6 +36,7 @@ const CORE=[
   "./v953-promotion-same-format.js",
   "./v955-current-ui.js",
   "./v1000-latest-share.js",
+  "./v1001-contrast-hotfix.js",
   "./share/",
   "./share/index.html"
 ];
