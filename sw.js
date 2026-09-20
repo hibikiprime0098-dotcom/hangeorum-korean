@@ -1,4 +1,4 @@
-const CACHE='hangeorum-v1004-unified';
+const CACHE='hangeorum-v1005-unified';
 const CORE=[
   "./",
   "./index.html",
