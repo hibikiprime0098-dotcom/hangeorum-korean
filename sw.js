@@ -1,14 +1,20 @@
-const CACHE='hangeorum-v98-restructure';
+const CACHE='hangeorum-v1002-unified';
 const CORE=[
-  './','./index.html','./base.html','./manifest.webmanifest','./icon.svg','./v81-patch-loader.js',
-  './v82-core.js','./v82-g1.js','./v82-g2.js','./v82-g3.js','./v82-g4.js','./v82-g5.js',
-  './v82-l1.js','./v82-l2.js','./v82-le1.js','./v82-le2.js','./v82-listen-ui.js','./v82-ui.js','./v83-progress.js','./v84-tests.js','./v85-learning.js','./v86-grammar.js','./v87-grammar-fix.js','./v88-sharing.js','./v89-growth-contrast.js','./v90-restructure.js',
-  './share/','./share/index.html','./share/shared-loader.js','./share/v90-redesign.js','./share/v91-final.js','./share/v92-product.js','./share/v93-curriculum-tests-growth.js','./share/v94-v93-compat.js','./share/v95-final-ui.js','./share/v96-launch.js'
+  './',
+  './index.html',
+  './base.html',
+  './manifest.webmanifest',
+  './icon.svg',
+  './v81-patch-loader.js',
+  './share/',
+  './share/index.html'
 ];
+
 self.addEventListener('install',e=>{
   e.waitUntil(caches.open(CACHE).then(c=>c.addAll(CORE)));
   self.skipWaiting();
 });
+
 self.addEventListener('activate',e=>{
   e.waitUntil((async()=>{
     const keys=await caches.keys();
@@ -16,18 +22,30 @@ self.addEventListener('activate',e=>{
     await self.clients.claim();
   })());
 });
+
 self.addEventListener('fetch',e=>{
   if(e.request.method!=='GET')return;
+
   if(e.request.mode==='navigate'){
-    e.respondWith(fetch(e.request,{cache:'no-store'}).then(r=>r).catch(()=>{
-      const u=new URL(e.request.url);
-      return u.pathname.includes('/share/')?caches.match('./share/index.html'):caches.match('./index.html');
-    }));
+    e.respondWith(
+      fetch(e.request,{cache:'no-store'})
+        .catch(()=>{
+          const u=new URL(e.request.url);
+          return u.pathname.includes('/share/')
+            ? caches.match('./share/index.html')
+            : caches.match('./index.html');
+        })
+    );
     return;
   }
-  e.respondWith(fetch(e.request,{cache:'no-store'}).then(r=>{
-    const copy=r.clone();
-    caches.open(CACHE).then(c=>c.put(e.request,copy));
-    return r;
-  }).catch(()=>caches.match(e.request));
+
+  e.respondWith(
+    fetch(e.request,{cache:'no-store'})
+      .then(r=>{
+        const copy=r.clone();
+        caches.open(CACHE).then(c=>c.put(e.request,copy));
+        return r;
+      })
+      .catch(()=>caches.match(e.request))
+  );
 });
