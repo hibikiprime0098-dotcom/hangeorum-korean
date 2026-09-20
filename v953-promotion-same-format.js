@@ -56,10 +56,21 @@ function promotionIntro(){
 }
 async function promotionQuestions(){
  const lv=targetLevel(),saved={view:state.view,mode:state.v90TestMode,active:state.miniActive,result:state.miniResult,questions:state.miniQuestions,answers:state.miniAnswers,index:state.miniIndex,type:state.miniType,level:state.miniLevel};
+ if(!(state.vocabData||[]).length){
+   try{
+     let ok=false;
+     if(typeof loadVocabCache==='function') ok=await loadVocabCache();
+     if(!ok&&typeof buildVocabDataset==='function') await buildVocabDataset();
+   }catch(e){console.warn('promotion vocab preparation failed',e)}
+ }
  const vocab=[],seen=new Set();
  for(let n=0;n<5&&vocab.length<16;n++){
    await startMini('vocab',lv,'all');
-   for(const q of (state.miniQuestions||[])){const k=(q.text||q.audio||q.q)+'|'+(q.o||[]).join('|');if(!seen.has(k)){seen.add(k);vocab.push({...q,cat:'語彙'})}if(vocab.length>=16)break}
+   for(const q of (state.miniQuestions||[])){
+     const k=(q.text||q.audio||(q.lines?JSON.stringify(q.lines):q.q))+'|'+(q.o||[]).join('|');
+     if(!seen.has(k)){seen.add(k);vocab.push({...q,cat:'語彙'})}
+     if(vocab.length>=16)break;
+   }
  }
  const rb=typeof window.v95ReadingBank==='function'?window.v95ReadingBank(lv):[];
  const lb=typeof window.v95ListeningBank==='function'?window.v95ListeningBank(lv):[];
@@ -67,8 +78,21 @@ async function promotionQuestions(){
  const listen=lb.slice(0,6).map(q=>({...q,cat:'Listening'}));
  const practical=[...lb.slice(6,13),...rb.slice(8,11)].slice(0,10).map((q,i)=>({...q,cat:i<5?'会話Listening':i<8?'スピーチListening':'実践理解'}));
  Object.assign(state,{view:'exam',v90TestMode:'promotion',miniActive:saved.active,miniResult:saved.result,miniQuestions:saved.questions,miniAnswers:saved.answers,miniIndex:saved.index,miniType:saved.type,miniLevel:saved.level});
- const all=[...vocab.slice(0,16),...reading,...listen,...practical];
- return all.slice(0,40).map((q,i)=>({...q,id:i+1,_promotionTarget:lv}));
+
+ const final=[],used=new Set();
+ const add=q=>{
+   if(!q)return;
+   const k=(q.text||q.audio||(q.lines?JSON.stringify(q.lines):q.q))+'|'+(q.o||[]).join('|');
+   if(used.has(k))return;
+   used.add(k);final.push(q);
+ };
+ [...vocab.slice(0,16),...reading,...listen,...practical].forEach(add);
+ for(const q of rb.slice(11))if(final.length<40)add({...q,cat:'Reading'});
+ for(const q of lb.slice(13))if(final.length<40)add({...q,cat:'Listening'});
+ if(final.length<40){
+   for(const q of [...rb,...lb]){if(final.length>=40)break;add({...q,cat:q.audio||q.lines?'Listening':'Reading'})}
+ }
+ return final.slice(0,40).map((q,i)=>({...q,id:i+1,_promotionTarget:lv}));
 }
 function promotionView(){
  const qs=state.v953PromotionQuestions||[];
