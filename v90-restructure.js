@@ -3,7 +3,7 @@ if(window.__HANGEORUM_V90_RESTRUCTURE__)return;window.__HANGEORUM_V90_RESTRUCTUR
 window.HANGEORUM_VERSION='9.0';document.title='한걸음 | 韓国語学習 v9.0';
 
 /* v9.0 information architecture
-   学習 = curriculum / grammar / vocabulary / listening
+   学習 = grammar / vocabulary / listening
    テスト = vocabulary / grammar / listening / promotion exam
    成長 = scores only
    ロードマップ = roadmap only
@@ -11,7 +11,8 @@ window.HANGEORUM_VERSION='9.0';document.title='한걸음 | 韓国語学習 v9.0'
 const V90_NAV=[['learn','▤','学習'],['exam','✓','テスト'],['progress','◇','成長'],['roadmap','↗','ロードマップ']];
 state.v90TestMode=state.v90TestMode||'hub';
 if(state.view==='home'||state.view==='listen')state.view='learn';
-if(!['course','grammar','vocab','listening'].includes(state.learnTab))state.learnTab='course';
+if(!['grammar','vocab','listening'].includes(state.learnTab))state.learnTab='grammar';
+if(state.learnTab==='course'){state.learnTab='grammar';localStorage.setItem('korean-learn-tab','grammar')}
 
 /* Bottom / side navigation: 4 destinations only. Existing route ids are reused so
    the base delegated navigation remains compatible. */
@@ -23,7 +24,7 @@ navHTML=function(m=false){return V90_NAV.map(n=>`<button type="button" class="${
 const v90LearnBefore=learn;
 learn=function(){
   if(state.vocabDrillActive||state.practiceStarted)return v90LearnBefore();
-  const tabs=`<div class="studyTabs v90StudyTabs"><button class="${state.learnTab==='course'?'active':''}" data-learn-tab="course">カリキュラム</button><button class="${state.learnTab==='grammar'?'active':''}" data-learn-tab="grammar">文法</button><button class="${state.learnTab==='vocab'?'active':''}" data-learn-tab="vocab">単語</button><button class="${state.learnTab==='listening'?'active':''}" data-learn-tab="listening">Listening</button></div>`;
+  const tabs=`<div class="studyTabs v90StudyTabs"><button class="${state.learnTab==='grammar'?'active':''}" data-learn-tab="grammar">文法</button><button class="${state.learnTab==='vocab'?'active':''}" data-learn-tab="vocab">単語</button><button class="${state.learnTab==='listening'?'active':''}" data-learn-tab="listening">Listening</button></div>`;
   if(state.learnTab==='listening')return tabs+listen();
   const html=v90LearnBefore();
   return /<div class="studyTabs">[\s\S]*?<\/div>/.test(html)?html.replace(/<div class="studyTabs">[\s\S]*?<\/div>/,tabs):tabs+html;
@@ -70,7 +71,7 @@ startMini=function(type,lv=state.miniLevel,source='all'){
 
 const v90Style=document.createElement('style');v90Style.id='v90-restructure-style';v90Style.textContent=`
 @media(max-width:900px){.mobileNav{grid-template-columns:repeat(4,1fr)!important}.mobileNav button{font-size:9px!important;min-height:58px!important}.mobileNav button span{font-size:15px!important}.v90StudyTabs{overflow-x:auto;scrollbar-width:none}.v90StudyTabs::-webkit-scrollbar{display:none}.v90StudyTabs button{min-width:84px;flex:1 0 auto}}
-.v90StudyTabs{grid-template-columns:repeat(4,1fr)}
+.v90StudyTabs{grid-template-columns:repeat(3,1fr)}
 .v90GrowthHero,.v90TestHero{background:#111!important;color:#fff!important;border-color:#111!important;padding:29px!important;box-shadow:0 18px 50px rgba(0,0,0,.10)}
 .v90GrowthHero h2,.v90TestHero h2{color:#fff!important;font-size:28px;margin:13px 0 9px;letter-spacing:-.045em}.v90GrowthHero p,.v90TestHero p{color:#c7c7c7!important;font-size:12px;line-height:1.8;margin:0}.v90GrowthHero p b,.v90TestHero p b{color:#fff!important}.v90GrowthHero .pill,.v90TestHero .pill{background:#fff!important;color:#111!important;border-color:#fff!important}
 .v90Latest{display:flex;align-items:baseline;gap:9px;margin-top:20px;padding-top:18px;border-top:1px solid #303030}.v90Latest span{font-size:10px;color:#aaa;font-weight:800}.v90Latest strong{font-size:38px;color:#fff}.v90Latest small{font-size:10px;color:#aaa}.v90Latest.empty{display:grid;gap:4px}.v90Latest.empty small{color:#999}
