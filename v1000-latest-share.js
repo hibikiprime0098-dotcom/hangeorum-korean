@@ -5,7 +5,8 @@ window.HANGEORUM_BUILD='1003';
 document.title='한걸음 | 韓国語学習 v10.0';
 
 const params=new URLSearchParams(location.search);
-if(params.get('fresh')==='1'){
+const hasTransfer=String(location.hash||'').startsWith('#hangeorum-transfer=');
+if(params.get('fresh')==='1'&&!hasTransfer){
   const shouldRemove=k=>/^korean-/i.test(k)||/^hangeorum-/i.test(k);
   for(let i=localStorage.length-1;i>=0;i--){
     const k=localStorage.key(i);
