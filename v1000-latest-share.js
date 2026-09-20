@@ -59,7 +59,8 @@ if(params.get('fresh')==='1'){
     v95ListenChecked:false
   });
 
-  history.replaceState(null,'',location.pathname);
+  const transferHash=String(location.hash||'').startsWith('#hangeorum-transfer=')?location.hash:'';
+  history.replaceState(null,'',location.pathname+transferHash);
 }
 
 const oldRender=render;
