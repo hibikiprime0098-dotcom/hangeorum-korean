@@ -1,7 +1,7 @@
 (()=>{
 if(window.__HANGEORUM_V1000__)return;window.__HANGEORUM_V1000__=1;
 window.HANGEORUM_VERSION='10.0';
-window.HANGEORUM_BUILD='1005';
+window.HANGEORUM_BUILD='1008';
 document.title='한걸음 | 韓国語学習 v10.0';
 
 const params=new URLSearchParams(location.search);
@@ -65,7 +65,7 @@ if(params.get('fresh')==='1'&&!hasTransfer){
 }
 
 function hgRgb(s){
-  const m=String(s||'').match(/rgba?\\(([^)]+)\\)/);if(!m)return null;
+  const m=String(s||'').match(/rgba?\(([^)]+)\)/);if(!m)return null;
   const a=m[1].split(',').map(Number);return{r:a[0]||0,g:a[1]||0,b:a[2]||0,a:a[3]??1};
 }
 function hgLum(c){
