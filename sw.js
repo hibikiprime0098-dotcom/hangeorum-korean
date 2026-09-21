@@ -36,7 +36,8 @@ const CORE=[
   "./v953-promotion-same-format.js",
   "./v955-current-ui.js",
   "./v1000-latest-share.js",
-  "./v1001-contrast-hotfix.js",\n  "./v1002-mobile-polish.js",
+  "./v1001-contrast-hotfix.js",
+  "./v1002-mobile-polish.js",
   "./share/",
   "./share/index.html"
 ];
