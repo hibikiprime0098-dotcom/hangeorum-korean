@@ -1,8 +1,8 @@
 (async()=>{
   if(window.__HANGEORUM_V99__||window.__HANGEORUM_V99_LOADING__)return;
   window.__HANGEORUM_V99_LOADING__=true;
-  const VERSION='1007';
-  const files=['v82-core.js','v82-g1.js','v82-g2.js','v82-g3.js','v82-g4.js','v82-g5.js','v82-l1.js','v82-l2.js','v82-le1.js','v82-le2.js','v82-listen-ui.js','v82-ui.js','v83-progress.js','v84-tests.js','v85-learning.js','v86-grammar.js','v87-grammar-fix.js','v88-sharing.js','v89-growth-contrast.js','v90-restructure.js','v91-nav-visibility.js','v92b-vocab-levels.js','v92c-reading-growth.js','v93-auto-mastery.js','v94-vocab-consistency.js','v95-listening-reading-depth.js','v951-test-count.js','v953-promotion-same-format.js','v955-current-ui.js','v1000-latest-share.js','v1001-contrast-hotfix.js','v1002-mobile-polish.js'];
+  const VERSION='1008';
+  const files=['v82-core.js','v82-g1.js','v82-g2.js','v82-g3.js','v82-g4.js','v82-g5.js','v82-l1.js','v82-l2.js','v82-le1.js','v82-le2.js','v82-listen-ui.js','v82-ui.js','v83-progress.js','v84-tests.js','v85-learning.js','v86-grammar.js','v87-grammar-fix.js','v88-sharing.js','v89-growth-contrast.js','v90-restructure.js','v91-nav-visibility.js','v92b-vocab-levels.js','v92c-reading-growth.js','v93-auto-mastery.js','v94-vocab-consistency.js','v95-listening-reading-depth.js','v951-test-count.js','v953-promotion-same-format.js','v955-current-ui.js','v1000-latest-share.js','v1001-contrast-hotfix.js','v1002-mobile-polish.js','v1003-global-contrast.js'];
   function load(file){return new Promise((resolve,reject)=>{const s=document.createElement('script');s.src=`./${file}?v=${VERSION}`;s.async=false;s.onload=()=>{s.remove();resolve()};s.onerror=()=>{s.remove();reject(new Error(`${file} の読み込みに失敗しました`))};document.head.appendChild(s)})}
   try{
     for(const file of files)await load(file);
