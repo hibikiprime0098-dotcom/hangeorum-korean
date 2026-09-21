@@ -40,7 +40,7 @@
           }catch{}
           return false;
         };
-        let firstOpen=true,receipts=[];
+        let firstOpen=!meaningfulProgress(),receipts=[];
         if(token){
           try{receipts=JSON.parse(localStorage.getItem('hg-share-receipts')||'[]')}catch{}
           if(!Array.isArray(receipts)) receipts=[];
